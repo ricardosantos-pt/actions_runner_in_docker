@@ -1,0 +1,2 @@
+docker build -t actions-builder -f ./builder/Dockerfile  .
+docker build -t actions-deployer -f ./deployer/Dockerfile  .
