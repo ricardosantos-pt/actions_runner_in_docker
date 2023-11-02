@@ -17,9 +17,8 @@ services:
 
   github-runner-deployer:
     container_name: github-runner-deployer
-    build:
-      dockerfile: "Dockerfile"
     restart: unless-stopped
+    image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/deployer:latest
     networks:
       - net_github_deployer
     volumes:

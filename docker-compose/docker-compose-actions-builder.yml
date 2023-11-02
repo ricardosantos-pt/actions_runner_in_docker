@@ -18,9 +18,8 @@ services:
 
   github-runner-builder:
     container_name: github-runner-builder
-    build:
-      dockerfile: "Dockerfile"
     restart: unless-stopped
+    image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/builder:latest
     networks:
       - net_github_builder
     volumes:
