@@ -56,7 +56,7 @@ spec:
               mountPath: /home/useragent/_work
           env:
             - name: DOCKER_HOST
-              value: tcp://docker-actions-deployer:2375/
+              value: tcp://localhost:2375/
             - name: GITHUB_ACTIONS_URL
               valueFrom:
                 configMapKeyRef:
