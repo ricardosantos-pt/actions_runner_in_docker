@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd ~/.actions-runner/
+
+echo "--------------------------------$(date)--------------------------------"
+
 check_vars()
 {
     var_names=("$@")
@@ -12,7 +16,6 @@ check_vars()
 
 check_vars KUBE_CONFIG GITHUB_ACTIONS_URL GITHUB_ACTIONS_TOKEN GITHUB_ACTIONS_AGENT_NAME
 
-cd ~/.actions-runner/
 #decode KUBE_CONFIG
 echo "$KUBE_CONFIG" > ~/.kube/config &&
 #confirm if svc.sh already exists if exists it was already configures

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd ~/.actions-runner/
+
+echo "--------------------------------$(date)--------------------------------"
+
 check_vars()
 {
     var_names=("$@")
@@ -11,8 +15,6 @@ check_vars()
 }
 
 check_vars DOCKER_REGISTRY_URL DOCKER_REGISTRY_USERNAME DOCKER_REGISTRY_TOKEN GITHUB_ACTIONS_URL GITHUB_ACTIONS_TOKEN GITHUB_ACTIONS_AGENT_NAME
-
-cd ~/.actions-runner/
 
 #check docker credential
 expected_registry=$DOCKER_REGISTRY_URL
