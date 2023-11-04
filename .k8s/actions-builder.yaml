@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: actions-runners
+  name: runners
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: actions-builder-secrets
-  namespace: actions-runners
+  name: builder-secrets
+  namespace: runners
 data:
   GITHUB_ACTIONS_TOKEN: ${DOCKER_REGISTRY_TOKEN}
   DOCKER_REGISTRY_TOKEN: ${DOCKER_REGISTRY_TOKEN}
@@ -15,8 +15,8 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: actions-builder-config
-  namespace: actions-runners
+  name: builder-config
+  namespace: runners
 data:
   GITHUB_ACTIONS_URL: ${GITHUB_ACTIONS_URL}
   GITHUB_ACTIONS_AGENT_NAME: ${GITHUB_ACTIONS_AGENT_NAME}
@@ -24,22 +24,22 @@ data:
   DOCKER_REGISTRY_USERNAME: ${DOCKER_REGISTRY_USERNAME}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: Pod
 metadata:
-  name: actions-builder-deployment
-  namespace: actions-runners
+  name: bulder-pod
+  namespace: runners
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: actions-builder
+      app: builder
   template:
     metadata:
       labels:
-        app: actions-builder
+        app: builder
     spec:
       containers:
-        - name: actions-builder-dind
+        - name: builder-dind
           image: docker:dind
           securityContext:
             privileged: true
@@ -51,44 +51,48 @@ spec:
               value: tcp://localhost:2375/
             - name: DOCKER_TLS_CERTDIR
               value: ""
-        - name: actions-builder
+        - name: builder
           image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/builder:latest
           volumeMounts:
             - name: data-volume
               mountPath: /home/useragent/_work
+            - name: builder-cache
+              mountPath: /home/useragent/.cache_volume
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375/
             - name: GITHUB_ACTIONS_URL
               valueFrom:
                 configMapKeyRef:
-                  name: actions-builder-config
+                  name: builder-config
                   key: GITHUB_ACTIONS_URL
             - name: GITHUB_ACTIONS_AGENT_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: actions-builder-config
+                  name: builder-config
                   key: GITHUB_ACTIONS_AGENT_NAME
             - name: GITHUB_ACTIONS_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: actions-builder-secrets
+                  name: builder-secrets
                   key: GITHUB_ACTIONS_TOKEN
             - name: DOCKER_REGISTRY_URL
               valueFrom:
                 configMapKeyRef:
-                  name: actions-builder-config
+                  name: builder-config
                   key: DOCKER_REGISTRY_URL
             - name: DOCKER_REGISTRY_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: actions-builder-config
+                  name: builder-config
                   key: DOCKER_REGISTRY_USERNAME
             - name: DOCKER_REGISTRY_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: actions-builder-secrets
+                  name: builder-secrets
                   key: DOCKER_REGISTRY_TOKEN
       volumes:
         - name: data-volume
+          emptyDir: {}
+        - name: builder-cache
           emptyDir: {}

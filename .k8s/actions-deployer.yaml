@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: actions-runners
+  name: runners
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: actions-deployer-secrets
-  namespace: actions-runners
+  name: deployer-secrets
+  namespace: runners
 data:
   KUBE_CONFIG: ${KUBE_CONFIG}
   GITHUB_ACTIONS_TOKEN: ${DOCKER_REGISTRY_TOKEN}
@@ -15,29 +15,29 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: actions-deployer-config
-  namespace: actions-runners
+  name: deployer-config
+  namespace: runners
 data:
   GITHUB_ACTIONS_URL: ${GITHUB_ACTIONS_URL}
   GITHUB_ACTIONS_AGENT_NAME: ${GITHUB_ACTIONS_AGENT_NAME}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: Pod
 metadata:
-  name: actions-deployer-deployment
-  namespace: actions-runners
+  name: deployer-pod
+  namespace: runners
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: actions-deployer
+      app: deployer
   template:
     metadata:
       labels:
-        app: actions-deployer
+        app: deployer
     spec:
       containers:
-        - name: actions-deployer-dind
+        - name: deployer-dind
           image: docker:dind
           securityContext:
             privileged: true
@@ -49,34 +49,38 @@ spec:
               value: tcp://localhost:2375/
             - name: DOCKER_TLS_CERTDIR
               value: ""
-        - name: actions-deployer
+        - name: deployer
           image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/deployer:latest
           volumeMounts:
             - name: data-volume
               mountPath: /home/useragent/_work
+            - name: builder-cache
+              mountPath: /home/useragent/.cache_volume
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375/
             - name: GITHUB_ACTIONS_URL
               valueFrom:
                 configMapKeyRef:
-                  name: actions-deployer-config
+                  name: deployer-config
                   key: GITHUB_ACTIONS_URL
             - name: GITHUB_ACTIONS_AGENT_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: actions-deployer-config
+                  name: deployer-config
                   key: GITHUB_ACTIONS_AGENT_NAME
             - name: GITHUB_ACTIONS_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: actions-deployer-secrets
+                  name: deployer-secrets
                   key: GITHUB_ACTIONS_TOKEN
             - name: KUBE_CONFIG
               valueFrom:
                 secretKeyRef:
-                  name: actions-deployer-secrets
+                  name: deployer-secrets
                   key: KUBE_CONFIG
       volumes:
         - name: data-volume
+          emptyDir: {}
+        - name: builder-cache
           emptyDir: {}
