@@ -3,7 +3,7 @@ FROM debian:bullseye-slim
 RUN useradd -ms /bin/bash useragent
 WORKDIR /home/useragent/
 
-RUN apt update && apt install curl coreutils apt-utils python3 ca-certificates gnupg -y 
+RUN apt update && apt install curl coreutils apt-utils python3 ca-certificates gnupg rsync jq -y 
 
 #install only docker cli and compose and buildx
 RUN mkdir /etc/apt/keyrings
