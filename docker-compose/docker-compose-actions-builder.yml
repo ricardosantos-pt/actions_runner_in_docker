@@ -19,7 +19,7 @@ services:
   github-runner-builder:
     container_name: github-runner-builder
     restart: unless-stopped
-    image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/builder:latest
+    image: ghcr.io/ricardosantos-pt/actions_runner_in_docker:latest
     networks:
       - net_github_builder
     volumes:

@@ -1,20 +1,20 @@
-name: Actions runner deployer
+name: Actions runner image build
 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - deployer/**
+      - actions-runner/**
       - emvsubt.py
       - install_github_actions.py
-      - .github/workflows/actions-deployer-publish.yml
+      - .github/workflows/actions-runner.yml
   pull_request:
     branches: [ "main" ]
     paths:
-      - deployer/**
+      - actions-runner/**
       - emvsubt.py
       - install_github_actions.py
-      - .github/workflows/actions-deployer-publish.yml
+      - .github/workflows/actions-runner.yml
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -61,9 +61,9 @@ jobs:
         uses: docker/metadata-action@v5.0.0
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/deployer
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
-            org.opencontainers.image.title=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/deployer
+            org.opencontainers.image.title=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             org.opencontainers.image.description=Docker image with github actions runner
             org.opencontainers.image.vendor=ricardosantos-pt
           tags: |
@@ -77,11 +77,12 @@ jobs:
         uses: docker/build-push-action@v5.0.0
         with:
           context: .
-          file: deployer/Dockerfile
+          file: actions-runner/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64 # This is where you specify the platforms you want to build for
+          provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
       

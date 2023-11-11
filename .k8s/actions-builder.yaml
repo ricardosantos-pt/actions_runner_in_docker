@@ -52,7 +52,7 @@ spec:
             - name: DOCKER_TLS_CERTDIR
               value: ""
         - name: builder
-          image: ghcr.io/ricardosantos-pt/actions_runner_in_docker/builder:latest
+          image: ghcr.io/ricardosantos-pt/actions_runner_in_docker:latest
           volumeMounts:
             - name: data-volume
               mountPath: /home/useragent/_work

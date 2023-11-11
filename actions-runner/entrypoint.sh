@@ -12,7 +12,11 @@ check_vars()
     return 0
 }
 
-check_vars DOCKER_REGISTRY_URL DOCKER_REGISTRY_USERNAME DOCKER_REGISTRY_TOKEN GITHUB_ACTIONS_URL GITHUB_ACTIONS_TOKEN GITHUB_ACTIONS_AGENT_NAME
+check_vars GITHUB_ACTIONS_URL GITHUB_ACTIONS_TOKEN GITHUB_ACTIONS_AGENT_NAME
+
+if [ ! -z "$DOCKER_REGISTRY_URL" ] || [ ! -z "$DOCKER_REGISTRY_USERNAME" ] || [ ! -z "$DOCKER_REGISTRY_TOKEN" ]; then
+    check_vars DOCKER_REGISTRY_URL DOCKER_REGISTRY_USERNAME DOCKER_REGISTRY_TOKEN
+fi
 
 #check docker credential
 expected_registry=$DOCKER_REGISTRY_URL
@@ -38,28 +42,33 @@ if [[ -d "$cache_folder" ]]; then
     rsync -av --files-from=<(echo "$files_to_cache") "$cache_folder/github_actions_cache/" ~/.actions-runner
   fi
 fi &&
-if [ -e ~/.docker/config.json ]; then
-    credentials=$(jq -r '.auths | to_entries[] | "\(.key) \(.value.auth)"' ~/.docker/config.json)
+if [ -z "$KUBE_CONFIG" ]; then
+    echo "$KUBE_CONFIG" > ~/.kube/config
 fi &&
-if [ -n "$credentials" ]; then
-    registry=$(echo "$credentials" | cut -d' ' -f1)
-    username=$(echo "$credentials" | cut -d' ' -f2 | base64 --decode | cut -d':' -f1)
-    
-    if [ "$registry" != "$expected_registry" ] || [ "$username" != "$expected_username" ]; then
-        echo "Current Docker login does not match the expected credentials."
-        exit 1
+if [ -n "$DOCKER_REGISTRY_URL" ] && [ -n "$DOCKER_REGISTRY_USERNAME" ] && [ -n "$DOCKER_REGISTRY_TOKEN" ]; then
+    if [ -e ~/.docker/config.json ]; then
+        credentials=$(jq -r '.auths | to_entries[] | "\(.key) \(.value.auth)"' ~/.docker/config.json)
+    fi &&
+    if [ -n "$credentials" ]; then
+        registry=$(echo "$credentials" | cut -d' ' -f1)
+        username=$(echo "$credentials" | cut -d' ' -f2 | base64 --decode | cut -d':' -f1)
+        
+        if [ "$registry" != "$expected_registry" ] || [ "$username" != "$expected_username" ]; then
+            echo "Current Docker login does not match the expected credentials."
+            exit 1
+        else
+            echo "Docker Registry and Username:"
+            echo "$registry $username"
+        fi
     else
-        echo "Docker Registry and Username:"
-        echo "$registry $username"
-    fi
-else
-    docker login $DOCKER_REGISTRY_URL -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_TOKEN;
-    if [[ "$cache_folder_exists" == "true" ]]; then
-        cd ~/.docker/
-        echo "Caching docker"
-        mkdir -p "$cache_folder/docker_cache/"
-        files_to_cache=$(find . -type f)
-        rsync -av --files-from=<(echo "$files_to_cache") ~/.docker "$cache_folder/docker_cache/"
+        docker login $DOCKER_REGISTRY_URL -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_TOKEN;
+        if [[ "$cache_folder_exists" == "true" ]]; then
+            cd ~/.docker/
+            echo "Caching docker"
+            mkdir -p "$cache_folder/docker_cache/"
+            files_to_cache=$(find . -type f)
+            rsync -av --files-from=<(echo "$files_to_cache") ~/.docker "$cache_folder/docker_cache/"
+        fi
     fi
 fi &&
 #confirm if svc.sh already exists if exists it was already configures

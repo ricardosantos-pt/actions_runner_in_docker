@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM --platform=$TARGETPLATFORM debian:bullseye-slim
 
 RUN useradd -ms /bin/bash useragent
 WORKDIR /home/useragent/
@@ -14,7 +14,6 @@ RUN echo \
   "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt update && apt install docker-ce-cli docker-buildx-plugin docker-compose-plugin
-
 
 # install kubectl
 RUN mkdir -p /etc/apt/keyrings/
@@ -34,7 +33,7 @@ RUN chown -R useragent /home/useragent/.kube/
 RUN chown -R useragent /home/useragent/_work/
 RUN chown -R useragent /home/useragent/.actions-runner/
 
-COPY ./builder/entrypoint.sh .
+COPY ./actions-runner/entrypoint.sh .
 RUN chmod +x /home/useragent/entrypoint.sh
 
 COPY ./emvsubt.py .
