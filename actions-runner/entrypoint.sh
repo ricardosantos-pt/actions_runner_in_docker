@@ -75,8 +75,6 @@ fi &&
 if [ ! -e ~/.actions-runner/svc.sh ]; then 
     cd ~/.actions-runner/
 
-    ./config.sh --check --url $GITHUB_ACTIONS_URL --pat $GITHUB_ACTIONS_TOKEN --unattended; 
-
     if [[ "$cache_folder_exists" == "true" ]]; then
         find . -type f -exec md5sum {} \; > before.md5
     fi
