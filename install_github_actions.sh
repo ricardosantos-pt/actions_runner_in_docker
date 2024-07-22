@@ -11,9 +11,9 @@ case "$is_amd64$is_arm64" in
     ;;
   truefalse)
     mkdir -p .actions-runner && cd .actions-runner
-    curl -o actions-runner-linux-x64-2.311.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.311.0/actions-runner-linux-x64-2.311.0.tar.gz
-    echo "29fc8cf2dab4c195bb147384e7e2c94cfd4d4022c793b346a6175435265aa278  actions-runner-linux-x64-2.311.0.tar.gz" | sha256sum -c -
-    tar xzf ./actions-runner-linux-x64-2.311.0.tar.gz
+    curl -o actions-runner-linux-x64-2.317.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
+    echo "9e883d210df8c6028aff475475a457d380353f9d01877d51cc01a17b2a91161d  actions-runner-linux-x64-2.317.0.tar.gz" | sha256sum -c -
+    tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
     rm actions-runner-*.tar.gz
     ./bin/installdependencies.sh
     ;;
@@ -23,9 +23,9 @@ case "$is_amd64$is_arm64" in
     ;;
   falsetrue)
     mkdir -p .actions-runner && cd .actions-runner
-    curl -o actions-runner-linux-arm64-2.311.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.311.0/actions-runner-linux-arm64-2.311.0.tar.gz
-    echo "5d13b77e0aa5306b6c03e234ad1da4d9c6aa7831d26fd7e37a3656e77153611e  actions-runner-linux-arm64-2.311.0.tar.gz" | sha256sum -c -
-    tar xzf ./actions-runner-linux-arm64-2.311.0.tar.gz
+    curl -o actions-runner-linux-arm64-2.317.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-arm64-2.317.0.tar.gz
+    echo "7e8e2095d2c30bbaa3d2ef03505622b883d9cb985add6596dbe2f234ece308f3  actions-runner-linux-arm64-2.317.0.tar.gz" | sha256sum -c -
+    tar xzf ./actions-runner-linux-arm64-2.317.0.tar.gz
     rm actions-runner-*.tar.gz
     ./bin/installdependencies.sh
     ;;

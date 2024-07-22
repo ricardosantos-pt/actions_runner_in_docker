@@ -83,13 +83,17 @@ if [ ! -e ~/.actions-runner/svc.sh ]; then
     pid=$!
     wait $pid
 
-    if [[ "$cache_folder_exists" == "true" ]]; then
-        echo "Caching github runner"
-        find . -type f -exec md5sum {} \; | grep -E -v 'before.md5|after.md5' > after.md5
-        files_changed=$(diff before.md5 after.md5 | awk '$1 == ">" {print $3}')
-        mkdir -p "$cache_folder/github_actions_cache/"
-        rsync -av --files-from=<(echo "$files_changed") ~/.actions-runner/ "$cache_folder/github_actions_cache/"
-        rm -f before.md5 after.md5
+    if [ $? -eq 0 ]; then
+        if [[ "$cache_folder_exists" == "true" ]]; then
+            echo "Caching github runner"
+            find . -type f -exec md5sum {} \; | grep -E -v 'before.md5|after.md5' > after.md5
+            files_changed=$(diff before.md5 after.md5 | awk '$1 == ">" {print $3}')
+            mkdir -p "$cache_folder/github_actions_cache/"
+            rsync -av --files-from=<(echo "$files_changed") ~/.actions-runner/ "$cache_folder/github_actions_cache/"
+            rm -f before.md5 after.md5
+        fi
+    else
+        echo "Previous command failed, skipping the if statement."
     fi
 fi &&
 #run actions
