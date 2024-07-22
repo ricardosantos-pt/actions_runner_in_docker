@@ -19,7 +19,7 @@ RUN apt update && apt install docker-ce-cli docker-buildx-plugin docker-compose-
 RUN mkdir -p /etc/apt/keyrings/
 RUN curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-focal main" | tee /etc/apt/sources.list.d/kubernetes.list
-RUN apt update && apt-get install -y kubectl
+RUN apt update && apt install -y kubectl
 
 # install github runner
 COPY ./install_github_actions.sh .
