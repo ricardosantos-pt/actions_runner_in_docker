@@ -75,15 +75,16 @@ fi &&
 if [ ! -e ~/.actions-runner/svc.sh ]; then 
     cd ~/.actions-runner/
 
+    ./config.sh --check --url $GITHUB_ACTIONS_URL --pat $GITHUB_ACTIONS_TOKEN --unattended; 
+
     if [[ "$cache_folder_exists" == "true" ]]; then
         find . -type f -exec md5sum {} \; > before.md5
     fi
 
     ./config.sh --replace --url $GITHUB_ACTIONS_URL --token $GITHUB_ACTIONS_TOKEN --name $GITHUB_ACTIONS_AGENT_NAME --labels $GITHUB_ACTIONS_AGENT_NAME --work /home/useragent/_work --unattended; 
-    pid=$!
-    wait $pid
+    config_status=$?
 
-    if [ $? -eq 0 ]; then
+    if [ $config_status -eq 0 ]; then
         if [[ "$cache_folder_exists" == "true" ]]; then
             echo "Caching github runner"
             find . -type f -exec md5sum {} \; | grep -E -v 'before.md5|after.md5' > after.md5
