@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM debian:bullseye-slim
+FROM --platform=$TARGETPLATFORM debian:bookworm-slim
 
 RUN useradd -ms /bin/bash useragent
 WORKDIR /home/useragent/
@@ -18,7 +18,7 @@ RUN apt update && apt install docker-ce-cli docker-buildx-plugin docker-compose-
 # install kubectl
 RUN mkdir -p /etc/apt/keyrings/
 RUN curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-focal main" | tee /etc/apt/sources.list.d/kubernetes.list
 RUN apt update && apt-get install -y kubectl
 
 # install github runner
