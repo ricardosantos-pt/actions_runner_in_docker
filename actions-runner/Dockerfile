@@ -6,7 +6,7 @@ WORKDIR /home/useragent/
 RUN apt update && apt install curl coreutils apt-utils python3 ca-certificates gnupg rsync jq -y 
 
 #install only docker cli and compose and buildx
-RUN mkdir /etc/apt/keyrings
+RUN mkdir -p /etc/apt/keyrings
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 RUN chmod a+r /etc/apt/keyrings/docker.gpg
 RUN echo \
