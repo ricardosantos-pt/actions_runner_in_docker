@@ -7,17 +7,16 @@ on:
       - actions-runner/**
       - emvsubt.py
       - install_github_actions.py
-      - .github/workflows/actions-runner.yml
+      - .github/workflows/actions-runner.yaml
   pull_request:
     branches: [ "main" ]
     paths:
       - actions-runner/**
       - emvsubt.py
       - install_github_actions.py
-      - .github/workflows/actions-runner.yml
+      - .github/workflows/actions-runner.yaml
   workflow_dispatch:
     
-
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -36,11 +35,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3.1.1
+        uses: sigstore/cosign-installer@v3.1.2
         with:
           cosign-release: 'v2.1.1'
 
@@ -48,11 +47,11 @@ jobs:
       # multi-platform images and export cache
       # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.0.0
+        uses: docker/setup-buildx-action@v3.1.0
 
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -60,7 +59,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5.0.0
+        uses: docker/metadata-action@v5.1.0
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -76,7 +75,7 @@ jobs:
 
       - name: Build docker image
         id: build-and-push
-        uses: docker/build-push-action@v5.0.0
+        uses: docker/build-push-action@v5.1.0
         with:
           context: .
           file: actions-runner/Dockerfile
